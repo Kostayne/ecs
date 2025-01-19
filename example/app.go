@@ -18,7 +18,7 @@ func main() {
 	velComp := MakeVelocityComponent(1, 1)
 
 	// creating new entities with components
-	player := ecs.EntityStore.AddNew(posComp, velComp)
+	player := ecs.EntityStore.New(posComp, velComp)
 
 	// setup
 	ecs.Setup()

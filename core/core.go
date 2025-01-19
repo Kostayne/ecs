@@ -21,19 +21,19 @@ func MakeECS() *ECS_Default {
 }
 
 func (e *ECS_Default) Setup() {
-	for _, s := range e.SystemStore.Systems {
+	for _, s := range e.SystemStore.GetAll() {
 		s.Setup(&e.EntityStore)
 	}
 }
 
 func (e *ECS_Default) Process() {
-	for _, s := range e.SystemStore.Systems {
+	for _, s := range e.SystemStore.GetAll() {
 		s.Process(&e.EntityStore)
 	}
 }
 
 func (e *ECS_Default) Cleanup() {
-	for _, s := range e.SystemStore.Systems {
+	for _, s := range e.SystemStore.GetAll() {
 		s.Cleanup(&e.EntityStore)
 	}
 }

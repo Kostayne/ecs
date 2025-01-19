@@ -17,8 +17,8 @@ func (s *_MovementSystem) GetType() string {
 func TestMakeSystemStore(t *testing.T) {
 	ss := MakeSystemStore()
 
-	if len(ss.Systems) != 0 {
-		t.Errorf("Expected empty Systems slice, got %d elements", len(ss.Systems))
+	if len(ss.GetAll()) != 0 {
+		t.Errorf("Expected empty Systems slice, got %d elements", len(ss.GetAll()))
 	}
 }
 
@@ -29,16 +29,16 @@ func TestSystemStoreAdd(t *testing.T) {
 	ss.Add(system)
 
 	t.Run("Unique system should be added", func(t *testing.T) {
-		if len(ss.Systems) != 1 {
-			t.Errorf("Expected 1 system, got %d", len(ss.Systems))
+		if len(ss.GetAll()) != 1 {
+			t.Errorf("Expected 1 system, got %d", len(ss.GetAll()))
 		}
 	})
 
 	t.Run("Non-unique system should not be added", func(t *testing.T) {
 		ss.Add(system)
 
-		if len(ss.Systems) != 1 {
-			t.Errorf("Expected 1 system, got %d", len(ss.Systems))
+		if len(ss.GetAll()) != 1 {
+			t.Errorf("Expected 1 system, got %d", len(ss.GetAll()))
 		}
 	})
 }
@@ -52,16 +52,16 @@ func TestSystemStoreRemove(t *testing.T) {
 	t.Run("Non-existent system should not be removed", func(t *testing.T) {
 		ss.Remove("non_existent_type")
 
-		if len(ss.Systems) != 1 {
-			t.Errorf("Expected 1 system, got %d", len(ss.Systems))
+		if len(ss.GetAll()) != 1 {
+			t.Errorf("Expected 1 system, got %d", len(ss.GetAll()))
 		}
 	})
 
 	t.Run("Existing system should be removed", func(t *testing.T) {
 		ss.Remove("sys_movement")
 
-		if len(ss.Systems) != 0 {
-			t.Errorf("Expected 0 systems, got %d", len(ss.Systems))
+		if len(ss.GetAll()) != 0 {
+			t.Errorf("Expected 0 systems, got %d", len(ss.GetAll()))
 		}
 	})
 }

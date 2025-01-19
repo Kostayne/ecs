@@ -1,37 +1,27 @@
 package core
 
-import (
-	"github.com/kostayne/ecs/utils"
-)
-
 type SystemStore struct {
-	Systems []System
+	systems map[string]System
 }
 
 func MakeSystemStore() *SystemStore {
 	return &SystemStore{
-		Systems: make([]System, 0),
+		systems: make(map[string]System),
 	}
 }
 
 func (ss *SystemStore) Add(system System) {
-	for _, s := range ss.Systems {
-		if s.GetType() == system.GetType() {
-			println("System of type " + system.GetType() + " already exists!")
-			return
-		}
-	}
-
-	ss.Systems = append(ss.Systems, system)
+	ss.systems[system.GetType()] = system
 }
 
 func (ss *SystemStore) Remove(typeName string) {
-	for i, s := range ss.Systems {
-		if s.GetType() == typeName {
-			ss.Systems = utils.ShiftRemoveI(ss.Systems, i)
-			return
-		}
-	}
+	delete(ss.systems, typeName)
+}
 
-	println("System of type " + typeName + " not found!")
+func (ss *SystemStore) Get(typeName string) System {
+	return ss.systems[typeName]
+}
+
+func (ss *SystemStore) GetAll() map[string]System {
+	return ss.systems
 }

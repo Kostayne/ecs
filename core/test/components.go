@@ -4,9 +4,7 @@ import (
 	. "github.com/kostayne/ecs/core"
 )
 
-type _TestComponent struct {
-	Component
-}
+type _TestComponent struct{}
 
 func (t *_TestComponent) Type() string {
 	return "TestComponent"

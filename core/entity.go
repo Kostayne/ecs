@@ -1,107 +1,86 @@
 package core
 
-import (
-	"github.com/kostayne/ecs/utils"
-)
-
 type EntityID uint64
 
-type Entity struct {
-	id         EntityID
-	Components []Component `json:"components"`
+type DefaultEntity struct {
+	id EntityID
+	es *EntityStore
 }
 
-// Get entity id
-func (e *Entity) Id() EntityID {
+type Entity interface {
+	Id() EntityID
+	Has(componentTypes ...string) bool
+	Get(componentType string) *Component
+	GetList(componentTypes ...string) []*Component
+	GetAll() []*Component
+	Add(components ...Component)
+	Remove(componentTypes ...string)
+}
+
+func makeEntity(id EntityID, es *EntityStore) Entity {
+	e := DefaultEntity{
+		id: id,
+		es: es,
+	}
+
+	return &e
+}
+
+// Returns entity ID
+func (e *DefaultEntity) Id() EntityID {
 	return e.id
 }
 
-// Add entity components
-func (e *Entity) Add(components ...Component) {
-	for _, c := range components {
-		isUnique := true
+// Returns true if all components are present
+func (e *DefaultEntity) Has(componentTypes ...string) bool {
+	comps := e.GetList(componentTypes...)
 
-		for _, ec := range e.Components {
-			if ec.Type() == c.Type() {
-				isUnique = false
-				break
-			}
-		}
-
-		if !isUnique {
-			println("Entity already has a component of type " + c.Type())
-			continue
-		}
-
-		e.Components = append(e.Components, c)
-	}
+	return len(comps) == len(componentTypes)
 }
 
-// Remove entity components
-func (e *Entity) Remove(components ...Component) {
-	for _, c := range components {
-		for i, ec := range e.Components {
-			if ec.Type() == c.Type() {
-				e.Components = utils.FastRemoveI(e.Components, i)
-				break
-			}
-		}
-	}
-}
-
-// Check if entity has components
-func (e *Entity) Has(componentTypes ...string) bool {
-	res := true
-
-	for _, ct := range componentTypes {
-		found := false
-
-		for _, ec := range e.Components {
-			if ec.Type() == ct {
-				found = true
-				break
-			}
-		}
-
-		if !found {
-			res = false
-			break
-		}
-	}
-
-	return res
-}
-
-// Get entity components list
-func (e *Entity) GetList(componentTypes ...string) []*Component {
-	res := make([]*Component, len(componentTypes))
-
-	for i, ct := range componentTypes {
-		for _, ec := range e.Components {
-			if ec.Type() == ct {
-				res[i] = &ec
-				break
-			}
-		}
-	}
-
-	return res
-}
-
-// Get entity component
-func (e *Entity) Get(componentType string) *Component {
-	for _, ec := range e.Components {
-		if ec.Type() == componentType {
-			return &ec
+// Returns a specified component
+func (e *DefaultEntity) Get(componentType string) *Component {
+	for _, c := range e.es.ec_map[e.id] {
+		if c.Type() == componentType {
+			return &c
 		}
 	}
 
 	return nil
 }
 
-// Create new entity
-func MakeEntity(id EntityID, components ...Component) *Entity {
-	return &Entity{
-		Components: components,
+// Returns a list of specified components
+func (e *DefaultEntity) GetList(componentTypes ...string) []*Component {
+	comps := make([]*Component, 0)
+
+	for _, c := range e.es.ec_map[e.id] {
+		for _, ct := range componentTypes {
+			if c.Type() == ct {
+				comps = append(comps, &c)
+			}
+		}
 	}
+
+	return comps
+}
+
+// Returns a list of all components
+func (e *DefaultEntity) GetAll() []*Component {
+	comps := make([]*Component, 0)
+
+	for _, c := range e.es.ec_map[e.id] {
+		comps = append(comps, &c)
+	}
+
+	return comps
+}
+
+// Adds components
+func (e *DefaultEntity) Add(components ...Component) {
+	e.es.AddTo(e.id, components...)
+}
+
+// Removes components
+func (e *DefaultEntity) Remove(componentTypes ...string) {
+	e.es.RemoveFrom(e.id, componentTypes...)
 }

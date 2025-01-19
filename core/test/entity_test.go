@@ -8,46 +8,52 @@ import (
 
 func TestEntityAdd(t *testing.T) {
 	t.Run("Add single component", func(t *testing.T) {
-		e := MakeEntity(1)
+		es := MakeEntityStore()
+		e := es.New()
+
 		e.Add(&_TestComponent{})
 
-		if len(e.Components) != 1 {
-			t.Errorf("Expected 1 component, got %d", len(e.Components))
+		if len(e.GetAll()) != 1 {
+			t.Errorf("Expected 1 component, got %d", len(e.GetAll()))
 		}
 	})
 
 	t.Run("Duplicate component", func(t *testing.T) {
-		e := MakeEntity(1)
+		es := MakeEntityStore()
+		e := es.New()
+
 		e.Add(&_TestComponent{})
 		e.Add(&_TestComponent{})
 
-		if len(e.Components) != 1 {
-			t.Errorf("Expected 1 component, got %d", len(e.Components))
+		if len(e.GetAll()) != 1 {
+			t.Errorf("Expected 1 component, got %d", len(e.GetAll()))
 		}
 	})
 }
 
 func TestEntityRemove(t *testing.T) {
 	t.Run("Remove single component", func(t *testing.T) {
-		e := MakeEntity(1)
-		e.Add(&_TestComponent{})
+		es := MakeEntityStore()
+		e := es.New(&_TestComponent{})
 
-		e.Remove(&_TestComponent{})
+		e.Remove("TestComponent")
 
-		if len(e.Components) != 0 {
-			t.Errorf("Expected 0 components, got %d", len(e.Components))
+		if len(e.GetAll()) != 0 {
+			t.Errorf("Expected 0 components, got %d", len(e.GetAll()))
 		}
 	})
 
-	t.Run("Remove non-existent component", func(t *testing.T) {
-		// remove should not panic
-		e := MakeEntity(1)
-		e.Remove(&_TestComponent{})
+	t.Run("Remove non-existent component should not panic", func(t *testing.T) {
+		es := MakeEntityStore()
+		e := es.New()
+
+		e.Remove("NonExistentComponent")
 	})
 }
 
 func TestEntityHas(t *testing.T) {
-	e := MakeEntity(1)
+	es := MakeEntityStore()
+	e := es.New()
 
 	t.Run("Has return false for non-existent component", func(t *testing.T) {
 		if e.Has("TestComponent") {
@@ -65,7 +71,9 @@ func TestEntityHas(t *testing.T) {
 }
 
 func TestEntityGetList(t *testing.T) {
-	e := MakeEntity(1)
+	es := MakeEntityStore()
+	e := es.New()
+
 	e.Add(&_TestComponent{})
 
 	res := e.GetList("TestComponent")
@@ -80,7 +88,9 @@ func TestEntityGetList(t *testing.T) {
 }
 
 func TestEntityGet(t *testing.T) {
-	e := MakeEntity(1)
+	es := MakeEntityStore()
+	e := es.New()
+
 	e.Add(&_TestComponent{})
 
 	t.Run("Get return nil for non-existent component", func(t *testing.T) {
