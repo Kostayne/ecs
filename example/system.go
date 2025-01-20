@@ -10,9 +10,12 @@ func (s *MovementSystem) GetType() string {
 	return "sys_movement"
 }
 
-// Optional
+// System lifecycle
 func (s *MovementSystem) Setup(es *core.EntityStore)   {}
 func (s *MovementSystem) Cleanup(es *core.EntityStore) {}
+
+func (s *MovementSystem) GetPriority() int   { return 0 }
+func (s *MovementSystem) GetFrequency() uint { return 0 }
 
 // Main logic
 func (s *MovementSystem) Process(es *core.EntityStore) {

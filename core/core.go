@@ -1,5 +1,7 @@
 package core
 
+import "time"
+
 type ECS_Core interface {
 	Setup()
 	Process()
@@ -9,8 +11,6 @@ type ECS_Core interface {
 type ECS_Default struct {
 	EntityStore EntityStore
 	SystemStore SystemStore
-
-	ECS_Core
 }
 
 func MakeECS() *ECS_Default {
@@ -27,8 +27,18 @@ func (e *ECS_Default) Setup() {
 }
 
 func (e *ECS_Default) Process() {
-	for _, s := range e.SystemStore.GetAll() {
-		s.Process(&e.EntityStore)
+	now := time.Now()
+	systems := e.SystemStore.GetAll()
+	callTime := e.SystemStore.GetLastCallTime()
+
+	for _, p := range e.SystemStore.GetPriority() {
+		s := systems[p.system]
+		elapsed := now.Sub(callTime[p.system])
+
+		if elapsed >= (time.Duration(s.GetFrequency()) * time.Millisecond) {
+			s.Process(&e.EntityStore)
+			callTime[p.system] = now
+		}
 	}
 }
 
