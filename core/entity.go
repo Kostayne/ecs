@@ -8,12 +8,23 @@ type DefaultEntity struct {
 }
 
 type Entity interface {
+	// Returns entity ID
 	Id() EntityID
+
+	// Returns true if all components are present
 	Has(componentTypes ...string) bool
+
+	// Returns a specified component
 	Get(componentType string) *Component
-	GetList(componentTypes ...string) []*Component
-	GetAll() []*Component
+
+	// Returns a list of specified components
+	GetList(componentTypes ...string) []Component
+	GetAll() []Component
+
+	// Adds provided components
 	Add(components ...Component)
+
+	// Removes components with provided types
 	Remove(componentTypes ...string)
 }
 
@@ -50,13 +61,13 @@ func (e *DefaultEntity) Get(componentType string) *Component {
 }
 
 // Returns a list of specified components
-func (e *DefaultEntity) GetList(componentTypes ...string) []*Component {
-	comps := make([]*Component, 0)
+func (e *DefaultEntity) GetList(componentTypes ...string) []Component {
+	comps := make([]Component, 0)
 
 	for _, c := range e.es.ec_map[e.id] {
 		for _, ct := range componentTypes {
 			if c.Type() == ct {
-				comps = append(comps, &c)
+				comps = append(comps, c)
 			}
 		}
 	}
@@ -65,11 +76,11 @@ func (e *DefaultEntity) GetList(componentTypes ...string) []*Component {
 }
 
 // Returns a list of all components
-func (e *DefaultEntity) GetAll() []*Component {
-	comps := make([]*Component, 0)
+func (e *DefaultEntity) GetAll() []Component {
+	comps := make([]Component, 0)
 
 	for _, c := range e.es.ec_map[e.id] {
-		comps = append(comps, &c)
+		comps = append(comps, c)
 	}
 
 	return comps

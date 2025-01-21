@@ -50,7 +50,7 @@ func TestEntityStoreGetById(t *testing.T) {
 	es := MakeEntityStore()
 
 	t.Run("Non-existent entity should not be found", func(t *testing.T) {
-		found := es.GetById(515)
+		found := es.GetComponentsById(515)
 
 		if found != nil {
 			t.Errorf("Expected entity not to be found, got %v", found)
@@ -59,7 +59,7 @@ func TestEntityStoreGetById(t *testing.T) {
 
 	t.Run("Existing entity should be found", func(t *testing.T) {
 		e := es.New()
-		found := es.GetById(e.Id())
+		found := es.GetComponentsById(e.Id())
 
 		if found == nil {
 			t.Errorf("Expected entity to be found, got nil")

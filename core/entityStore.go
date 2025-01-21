@@ -20,6 +20,7 @@ type EntityStore struct {
 	entities map[EntityID]Entity
 }
 
+// Creates a new entity store
 func MakeEntityStore() *EntityStore {
 	return &EntityStore{
 		maxId: 0,
@@ -31,6 +32,7 @@ func MakeEntityStore() *EntityStore {
 	}
 }
 
+// Creates a new entity with provided components
 func (es *EntityStore) New(components ...Component) Entity {
 
 	for _, c := range components {
@@ -44,6 +46,7 @@ func (es *EntityStore) New(components ...Component) Entity {
 	return e
 }
 
+// Removes an entity by id
 func (es *EntityStore) Remove(id EntityID) {
 	for cType := range es.ec_map[id] {
 		delete(es.ce_map[cType], id)
@@ -53,6 +56,7 @@ func (es *EntityStore) Remove(id EntityID) {
 	delete(es.entities, id)
 }
 
+// Adds components to an entity by ID
 func (es *EntityStore) AddTo(id EntityID, components ...Component) {
 	for _, c := range components {
 		cType := c.Type()
@@ -70,6 +74,7 @@ func (es *EntityStore) AddTo(id EntityID, components ...Component) {
 	}
 }
 
+// Removes components from an entity by ID
 func (es *EntityStore) RemoveFrom(id EntityID, componentTypes ...string) {
 	for _, cType := range componentTypes {
 		delete(es.ce_map[cType], id)
@@ -77,7 +82,8 @@ func (es *EntityStore) RemoveFrom(id EntityID, componentTypes ...string) {
 	}
 }
 
-func (es *EntityStore) GetById(id EntityID) []*Component {
+// Returns a list of components by entity ID
+func (es *EntityStore) GetComponentsById(id EntityID) []Component {
 	e := es.entities[id]
 
 	if e == nil {
@@ -87,6 +93,7 @@ func (es *EntityStore) GetById(id EntityID) []*Component {
 	return e.GetAll()
 }
 
+// Returns a list of all entities
 func (es *EntityStore) GetAll() []*Entity {
 	entities := make([]*Entity, len(es.ec_map))
 

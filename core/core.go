@@ -13,6 +13,7 @@ type ECS_Default struct {
 	SystemStore SystemStore
 }
 
+// Creates a new ECS instance
 func MakeECS() *ECS_Default {
 	return &ECS_Default{
 		EntityStore: *MakeEntityStore(),
@@ -20,12 +21,14 @@ func MakeECS() *ECS_Default {
 	}
 }
 
+// Runs all systems setup
 func (e *ECS_Default) Setup() {
 	for _, s := range e.SystemStore.GetAll() {
 		s.Setup(&e.EntityStore)
 	}
 }
 
+// Processes all systems considering their frequency and priority
 func (e *ECS_Default) Process() {
 	now := time.Now()
 	systems := e.SystemStore.GetAll()
@@ -42,6 +45,7 @@ func (e *ECS_Default) Process() {
 	}
 }
 
+// Runs all systems cleanup
 func (e *ECS_Default) Cleanup() {
 	for _, s := range e.SystemStore.GetAll() {
 		s.Cleanup(&e.EntityStore)

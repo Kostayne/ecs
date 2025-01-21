@@ -63,6 +63,7 @@ func (f *Finder) Where(predicate func(*Entity) bool) *Finder {
 	return f
 }
 
+// Returns all matched entities list
 func (f *Finder) GetMany() []Entity {
 	entities := make([]Entity, len(f.entityIds))
 
@@ -73,6 +74,7 @@ func (f *Finder) GetMany() []Entity {
 	return entities
 }
 
+// Returns first matched entity
 func (f *Finder) GetOne() Entity {
 	if len(f.entityIds) == 0 {
 		return nil

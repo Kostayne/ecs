@@ -82,8 +82,8 @@ func TestEntityGetList(t *testing.T) {
 		t.Errorf("Expected 1 component, got %d", len(res))
 	}
 
-	if (*res[0]).Type() != "TestComponent" {
-		t.Errorf("Expected TestComponent, got %s", (*res[0]).Type())
+	if res[0].Type() != "TestComponent" {
+		t.Errorf("Expected TestComponent, got %s", res[0].Type())
 	}
 }
 
