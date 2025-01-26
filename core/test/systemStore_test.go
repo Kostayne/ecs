@@ -2,6 +2,7 @@ package engine_test
 
 import (
 	"testing"
+	"time"
 
 	. "github.com/kostayne/ecs/core"
 )
@@ -17,9 +18,9 @@ func (s *_MovementSystem) GetType() string {
 func (s *_MovementSystem) GetPriority() int   { return 0 }
 func (s *_MovementSystem) GetFrequency() uint { return 0 }
 
-func (s *_MovementSystem) Setup(es *EntityStore)   {}
-func (s *_MovementSystem) Process(es *EntityStore) {}
-func (s *_MovementSystem) Cleanup(es *EntityStore) {}
+func (s *_MovementSystem) Setup(es *EntityStore)                     {}
+func (s *_MovementSystem) Process(es *EntityStore, dt time.Duration) {}
+func (s *_MovementSystem) Cleanup(es *EntityStore)                   {}
 
 func TestMakeSystemStore(t *testing.T) {
 	ss := MakeSystemStore()

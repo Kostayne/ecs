@@ -1,20 +1,22 @@
 package core
 
+import "time"
+
 type System interface {
-	// Should return a unique system type string
+	// Returns a unique system type (string)
 	GetType() string
 
-	// System priority, higher number means higher priority
+	// Returns system priority, higher number means higher priority
 	GetPriority() int
 
-	// Process frequency in milliseconds
+	// Returns process frequency in milliseconds
 	GetFrequency() uint
 
 	// Called once before the main loop
 	Setup(entityStore *EntityStore)
 
-	// Called in main loop
-	Process(entityStore *EntityStore)
+	// Called in main loop, dt is delta time (time since last call)
+	Process(entityStore *EntityStore, dt time.Duration)
 
 	// Called once after the main loop
 	Cleanup(entityStore *EntityStore)

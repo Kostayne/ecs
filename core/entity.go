@@ -14,11 +14,13 @@ type Entity interface {
 	// Returns true if all components are present
 	Has(componentTypes ...string) bool
 
-	// Returns a specified component
-	Get(componentType string) *Component
+	// Returns a specified component, may return nil
+	GetOne(componentType string) *Component
 
 	// Returns a list of specified components
 	GetList(componentTypes ...string) []Component
+
+	// Returns a list of all components
 	GetAll() []Component
 
 	// Adds provided components
@@ -50,7 +52,7 @@ func (e *DefaultEntity) Has(componentTypes ...string) bool {
 }
 
 // Returns a specified component
-func (e *DefaultEntity) Get(componentType string) *Component {
+func (e *DefaultEntity) GetOne(componentType string) *Component {
 	for _, c := range e.es.ec_map[e.id] {
 		if c.Type() == componentType {
 			return &c

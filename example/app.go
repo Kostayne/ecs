@@ -22,7 +22,7 @@ func main() {
 
 	// setup
 	ecs.Setup()
-	plPos := (*player.Get("position")).(*PositionComponent)
+	plPos := (*player.GetOne("position")).(*PositionComponent)
 
 	// main loop
 	for i := 0; i < 5; i++ {

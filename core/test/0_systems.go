@@ -1,6 +1,8 @@
 package engine_test
 
 import (
+	"time"
+
 	. "github.com/kostayne/ecs/core"
 )
 
@@ -22,7 +24,7 @@ func (t *_TEST_CORE_SYS_A) GetFrequency() uint { return 0 }
 func (t *_TEST_CORE_SYS_A) Setup(entityStore *EntityStore)   {}
 func (t *_TEST_CORE_SYS_A) Cleanup(entityStore *EntityStore) {}
 
-func (t *_TEST_CORE_SYS_A) Process(entityStore *EntityStore) {
+func (t *_TEST_CORE_SYS_A) Process(entityStore *EntityStore, dt time.Duration) {
 	t.CallIndex = *t.PrevCallIndex + 1
 	*t.PrevCallIndex = t.CallIndex
 
@@ -47,7 +49,7 @@ func (t *_TEST_CORE_SYS_B) GetFrequency() uint { return 15 }
 func (t *_TEST_CORE_SYS_B) Setup(entityStore *EntityStore)   {}
 func (t *_TEST_CORE_SYS_B) Cleanup(entityStore *EntityStore) {}
 
-func (t *_TEST_CORE_SYS_B) Process(entityStore *EntityStore) {
+func (t *_TEST_CORE_SYS_B) Process(entityStore *EntityStore, dt time.Duration) {
 	t.CallIndex = *t.PrevCallIndex + 1
 	*t.PrevCallIndex = t.CallIndex
 

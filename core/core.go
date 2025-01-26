@@ -39,7 +39,7 @@ func (e *ECS_Default) Process() {
 		elapsed := now.Sub(callTime[p.system])
 
 		if elapsed >= (time.Duration(s.GetFrequency()) * time.Millisecond) {
-			s.Process(&e.EntityStore)
+			s.Process(&e.EntityStore, elapsed)
 			callTime[p.system] = now
 		}
 	}

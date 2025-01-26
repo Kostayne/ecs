@@ -12,6 +12,14 @@ type _SystemPriority struct {
 	system   string
 }
 
+func (p *_SystemPriority) GetValue() int {
+	return p.priority
+}
+
+func (p *_SystemPriority) GetSystemType() string {
+	return p.system
+}
+
 type SystemStore struct {
 	systems map[string]System
 

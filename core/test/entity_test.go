@@ -94,7 +94,7 @@ func TestEntityGet(t *testing.T) {
 	e.Add(&_TestComponent{})
 
 	t.Run("Get return nil for non-existent component", func(t *testing.T) {
-		res := e.Get("NonExistingComponent")
+		res := e.GetOne("NonExistingComponent")
 
 		if res != nil {
 			t.Errorf("Expected nil, got %s", (*res).Type())
@@ -102,7 +102,7 @@ func TestEntityGet(t *testing.T) {
 	})
 
 	t.Run("Get return existing component", func(t *testing.T) {
-		res := e.Get("TestComponent")
+		res := e.GetOne("TestComponent")
 
 		if res == nil {
 			t.Errorf("Expected TestComponent, got nil")

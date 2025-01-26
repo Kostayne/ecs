@@ -1,6 +1,8 @@
 package example
 
 import (
+	"time"
+
 	"github.com/kostayne/ecs/core"
 )
 
@@ -18,12 +20,12 @@ func (s *MovementSystem) GetPriority() int   { return 0 }
 func (s *MovementSystem) GetFrequency() uint { return 0 }
 
 // Main logic
-func (s *MovementSystem) Process(es *core.EntityStore) {
+func (s *MovementSystem) Process(es *core.EntityStore, dt time.Duration) {
 	finder := core.MakeFinder(es)
 	entities := finder.Has("position").GetMany()
 
 	for _, e := range entities {
-		comp := *e.Get("position")
+		comp := *e.GetOne("position")
 		pos := comp.(*PositionComponent)
 
 		// one line version

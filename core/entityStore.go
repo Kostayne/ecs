@@ -11,6 +11,7 @@ type EC_Map = map[EntityID]map[ComponentType]Component
 // Needed for storing empty entities
 type _EntityMap = map[EntityID]Entity
 
+// Stores entities and provides convenient management methods
 type EntityStore struct {
 	maxId EntityID
 

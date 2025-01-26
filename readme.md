@@ -9,7 +9,7 @@ This package provides a basic implementation of Entity Component System pattern.
 
 **System** - a set of logic that can be applied to the entity.
 
-## Table of content
+## TOC
 <!-- - [Definitions](#definitions) -->
 - [Usage](#usage)
     - [Components](#define-components)
@@ -17,10 +17,12 @@ This package provides a basic implementation of Entity Component System pattern.
     - [Main loop](#start-the-app)
 - [Wiki](#wiki)
 	- [Finder](#finder)
-		- [Has](#finderhascomponents-string-finder)
-		- [Where](#finderwherepredicate-funcentity-bool-finder)
-		- [GetOne](#findergetone-entity)
-		- [GetMany](#findergetmany-entity)
+		- [Constructor](#----finder-constructor----)
+		- [Methods](#----finder-methods----)
+			- [Has](#finderhascomponents-string-finder)
+			- [Where](#finderwherepredicate-funcentity-bool-finder)
+			- [GetOne](#findergetone-entity)
+			- [GetMany](#findergetmany-entity)
 	- [Entity](#entity)
 		- [Structure](#entity-structure)
 		- [Methods](#entity-methods)
@@ -35,11 +37,31 @@ This package provides a basic implementation of Entity Component System pattern.
 			- [Setup](#systemsetupentitystore-entitystore)
 			- [Process](#systemprocessentitystore-entitystore)
 			- [Cleanup](#systemcleanupentitystore-entitystore)
+	- [ECS Core](#ecs-core)
+		- [Constructor](#----ecs-constructor----)
+		- [Methods](#----ecs-core-methods----)
+			- [Setup](#ecssetup)
+			- [Process](#ecsprocess)
+			- [Cleanup](#ecscleanup)
+	- [EntityStore](#entitystore)
+		- [Methods](#----entity-store-methods----)
+			- [New](#entitystorenewcomponents-component-entity)
+			- [Remove](#entitystoreremoveentity-entity)
+			- [AddTo](#entitystoreaddtoentity-entity-components-component)
+			- [RemoveFrom](#entitystoreremovefromentity-entity-componenttypes-string)
+			- [GetComponentsById](#entitystoregetcomponentsbyidentityid-entityid-component)
+	- [SystemStore](#system-store)
+		- [Methods](#----system-store-methods----)
+			- [Add](#systemstoreaddsystem-system)
+			- [Remove](#systemstoreremovetypename-string)
+			- [Get](#systemstoregettypename-string-system)
+			- [GetAll](#systemstoregetall-system)
+			- [GetPriority](#systemstoregetpriority-_systempriority)
+			- [GetLastCallTime](#systemstoregetlastcalltime-mapstringtimetime)
 
 ## Usage
 
 ### Define components
-
 First, we'll define a simple component (component.go):
 
 ```go
@@ -78,12 +100,16 @@ func (s *MovementSystem) GetType() string {
 	return "sys_movement"
 }
 
-// Optional
+// Hooks
 func (s *MovementSystem) Setup(es *core.EntityStore) {}
 func (s *MovementSystem) Cleanup(es *core.EntityStore) {}
 
+// Params
+func (s *MovementSystem) GetPriority() int   { return 0 }
+func (s *MovementSystem) GetFrequency() uint { return 0 }
+
 // Main logic
-func (s *MovementSystem) Process(es *core.EntityStore) {
+func (s *MovementSystem) Process(es *core.EntityStore, dt time.Duration) {
 	finder := core.MakeFinder(es)
 	entities := finder.Has("position").GetMany()
 
@@ -149,10 +175,28 @@ func main() {
 
 Finder is a helper that allows to find entities by components or arbitrary criteria.
 
+### --- Finder Interface ---
+
+```go
+type FinderI interface {
+	Get() Entity
+	GetMany() []Entity
+	Has(components ...string) *FinderI
+	Where(predicate func(*Entity) bool) *FinderI
+}
+```
+
+#### --- Finder Constructor ---
+
+```go
+ecs := core.MakeECS()
+
+finder := core.MakeFinder(&ecs.SystemStore)
+```
+
 #### --- Finder Methods ---
 
 #### Finder.Has(components ...string) *Finder
-
 Returns a finder with entities that have provided components
 
 ```go
@@ -205,8 +249,8 @@ Returns entity id
 id := entity.Id()
 ```
 
-#### Entity.Get(componentType string) *Component
-Returns a component by provided type
+#### Entity.GetOne(componentType string) *Component
+Returns a component by provided type, may return nil
 
 ```go
 pos := (*e.Get("position")).(*PositionComponent)
@@ -277,8 +321,10 @@ System manipulates entities and their components data.
 ```go
 type System interface {
 	GetType() string
+	GetPriority() int
+	GetFrequency() uint
 	Setup(entityStore *EntityStore)
-	Process(entityStore *EntityStore)
+	Process(entityStore *EntityStore, dt time.Duration)
 	Cleanup(entityStore *EntityStore)
 }
 ```
@@ -297,6 +343,27 @@ func (sys *ExampleSystem) GetType() string {
 sysType := system.GetType()
 ```
 
+#### System.GetPriority()
+Returns system priority, higher number means higher priority
+
+```go
+func (sys *ExampleSystem) GetPriority() int {
+	// define system priority here
+	return 0
+}
+```
+
+#### System.GetFrequency()
+Returns process frequency in milliseconds
+
+```go
+func (sys *ExampleSystem) GetFrequency() uint {
+	// define system frequency here
+	// return zero (0) to call as often as possible
+	return 0
+}
+```
+
 #### System.Setup(entityStore *EntityStore)
 Setup is called once before the main loop
 
@@ -310,14 +377,21 @@ for true {
 }
 ```
 
-#### System.Process(entityStore *EntityStore)
+#### System.Process(entityStore *EntityStore, dt time.Duration)
 Runs system logic once, has to be called in the main loop
 
 ```go
-// main loop
-for true {
-	// use ECS_CORE
-	ecs.Process()
+func (s *MovementSystem) Process(es *core.EntityStore, dt time.Duration) {
+	finder := core.MakeFinder(es)
+	entities := finder.Has("position").GetMany()
+
+	for _, e := range entities {
+		comp := *e.GetOne("position")
+		pos := comp.(*PositionComponent)
+
+		pos.X 
+		pos.Y += 2
+	}
 }
 ```
 
@@ -334,4 +408,142 @@ for !needToExit {
 
 // use ECS_CORE
 ecs.Cleanup()
+```
+
+### ECS Core
+Core links systems and entities, it provides process loop and setup/cleanup methods.
+
+#### --- ECS Constructor ---
+```go
+ecs := core.MakeECS()
+```
+
+#### --- ECS Methods ---
+
+#### ECS.Setup()
+Runs all systems setup once
+
+```go
+ecs.Setup()
+```
+
+#### ECS.Process()
+Runs all systems process once
+
+```go
+ecs.Process()
+```
+
+#### ECS.Cleanup()
+Runs all systems cleanup once
+
+### Entity Store
+Stores entities and provides convenient management methods.
+
+#### --- Entity Store Constructor ---
+```go
+es := core.MakeEntityStore()
+```
+
+#### --- Entity Store Methods ---
+
+#### EntityStore.New(components ...Component) Entity
+Creates a new entity with provided components
+
+```go
+posComp := MakePositionComponent(0, 0)
+velComp := MakeVelocityComponent(1, 1)
+entity := ecs.EntityStore.New(posComp, velComp)
+```
+
+#### EntityStore.GetComponentsById(entityId EntityID) []Component
+Returns all components by entity id
+
+```go
+comps := ecs.EntityStore.GetComponentsById(1)
+```
+
+#### EntityStore.AddTo(entity Entity, components ...Component)
+Adds components to an entity by ID
+
+```go
+ecs.EntityStore.AddTo(1, posComp, velComp)
+```
+
+#### EntityStore.RemoveFrom(entity Entity, componentTypes ...string)
+Removes components from an entity by ID
+
+```go
+ecs.EntityStore.RemoveFrom(1, "position", "velocity")
+```
+
+#### EntityStore.Remove(entity Entity)
+Removes an entity by id
+
+```go
+ecs.EntityStore.Remove(1)
+```
+
+#### EntityStore.GetAll() []*Entity
+Returns a list of all entities
+
+```go
+entities := ecs.EntityStore.GetAll()
+```
+
+### System Store
+Stores systems and provides convenient management methods.
+
+#### --- System Store Constructor ---
+```go
+ss := core.MakeSystemStore()
+```
+
+#### --- System Store Methods ---
+
+#### SystemStore.Add(system System)
+Adds system to the store
+
+```go
+ecs.SystemStore.Add(sys)
+```
+
+#### SystemStore.Remove(typeName string)
+Removes system from the store
+
+```go
+ecs.SystemStore.Remove("sys_example")
+```
+
+#### SystemStore.Get(typeName string) System
+Returns system by type (string)
+
+```go
+sys := ecs.SystemStore.Get("sys_example")
+```
+
+#### SystemStore.GetAll() []System
+Returns a list of all systems
+
+```go
+systems := ecs.SystemStore.GetAll()
+```
+
+#### SystemStore.GetPriority() []_SystemPriority
+Returns a list of all systems sorted by priority
+
+```go
+priorities := ecs.SystemStore.GetPriority()
+
+mostPrioritySys := priorities[0].GetType() // string
+lastPrioritySys := priorities[len(systems)-1].GetType() // string
+```
+
+#### SystemStore.GetLastCallTime() map[string]time.Time
+Returns a map of all systems last call time
+
+```go
+lastCallMap := ecs.SystemStore.GetLastCallTime()
+
+moveSysLastCall := lastCallMap["sys_example"]
 ```

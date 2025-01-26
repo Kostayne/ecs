@@ -25,7 +25,7 @@ func (s *_TestSystem) Setup(entityStore *EntityStore) {
 	s.IsSetupCalled = true
 }
 
-func (s *_TestSystem) Process(entityStore *EntityStore) {
+func (s *_TestSystem) Process(entityStore *EntityStore, dt time.Duration) {
 	s.IsProcessCalled = true
 }
 
