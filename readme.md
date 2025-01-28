@@ -1,5 +1,10 @@
 # Kostayne ECS
+![GitHub Tag](https://img.shields.io/github/v/tag/kostayne/ecs?label=version)
 ![GitHub License](https://img.shields.io/github/license/kostayne/ecs)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/kostayne/ecs/go.yml)
+![GitHub top language](https://img.shields.io/github/languages/top/kostayne/ecs?style=flat&logo=go&logoColor=white&logoSize=20px&label=Pure%20go)
+
+
 
 This package provides a basic implementation of Entity Component System pattern. ECS separates logic from data, which makes the app more scalable and flexible. It's ideal for complex games or simulations.
 
