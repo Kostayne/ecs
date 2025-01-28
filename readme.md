@@ -1,4 +1,6 @@
 # Kostayne ECS
+![GitHub License](https://img.shields.io/github/license/kostayne/ecs)
+
 This package provides a basic implementation of Entity Component System pattern. ECS separates logic from data, which makes the app more scalable and flexible. It's ideal for complex games or simulations.
 
 ### Definitions
