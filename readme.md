@@ -4,8 +4,6 @@
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/kostayne/ecs/go.yml)
 ![GitHub top language](https://img.shields.io/github/languages/top/kostayne/ecs?style=flat&logo=go&logoColor=white&logoSize=20px&label=Pure%20go)
 
-
-
 This package provides a basic implementation of Entity Component System pattern. ECS separates logic from data, which makes the app more scalable and flexible. It's ideal for complex games or simulations.
 
 ### Definitions
@@ -121,11 +119,11 @@ func (s *MovementSystem) Process(es *core.EntityStore, dt time.Duration) {
 	entities := finder.Has("position").GetMany()
 
 	for _, e := range entities {
-		comp := *e.Get("position")
+		comp := *e.GetOne("position")
 		pos := comp.(*PositionComponent)
 
 		// one line version
-		// pos := (*e.Get("position")).(*PositionComponent)
+		// pos := (*e.GetOne("position")).(*PositionComponent)
 
 		pos.X += 1
 		pos.Y += 2
@@ -164,7 +162,7 @@ func main() {
 
 	// setup
 	ecs.Setup()
-	plPos := (*player.Get("position")).(*PositionComponent)
+	plPos := (*player.GetOne("position")).(*PositionComponent)
 
 	// main loop
 	for i := 0; i < 5; i++ {
@@ -215,7 +213,7 @@ Returns a finder with entities that match provided predicate
 
 ```go
 func isEntityOnTheRight(e *Entity) bool {
-	pos := (*e.Get("position")).(*PositionComponent)
+	pos := (*e.GetOne("position")).(*PositionComponent)
 	return pos.X > 0
 }
 
@@ -260,7 +258,7 @@ id := entity.Id()
 Returns a component by provided type, may return nil
 
 ```go
-pos := (*e.Get("position")).(*PositionComponent)
+pos := (*e.GetOne("position")).(*PositionComponent)
 ```
 
 #### Entity.GetList(componentTypes ...string) []*Component
