@@ -1,6 +1,6 @@
 package utils
 
-// Fast removes the element at the given index, changes the order of the array
+// Fast removes the element at the given index, changes the order of the array.
 func FastRemoveI[T any](arr []T, i int) []T {
 	if len(arr) == 0 {
 		return []T{}
@@ -14,7 +14,7 @@ func FastRemoveI[T any](arr []T, i int) []T {
 	return arr[:len(arr)-1]
 }
 
-// Fast removes the first encountered element with the given value, changes the order of the array
+// Fast removes the first encountered element with the given value, changes the order of the array.
 func FastRemove[T comparable](arr []T, item T) []T {
 	index := IndexOf(arr, item)
 
@@ -25,7 +25,7 @@ func FastRemove[T comparable](arr []T, item T) []T {
 	return FastRemoveI(arr, IndexOf(arr, item))
 }
 
-// Slow removes the element at the given index, saves the order of the array
+// Slow removes the element at the given index, saves the order of the array.
 func ShiftRemoveI[T any](arr []T, index int) []T {
 	if len(arr) == 0 {
 		return []T{}

@@ -174,8 +174,6 @@ ecs.EntityStore.AddTo(entity.Id(), MakePositionComponent(0, 0))
 ecs.EntityStore.RemoveFrom(entity.Id(), "position")
 ```
 
-To find out more, see the [documentation](https://pkg.go.dev/github.com/kostayne/ecs/core).
-
 ### Finder
 
 Finder is a helper that allows to find entities by components or arbitrary criteria.
@@ -227,7 +225,7 @@ Returns a single matched entity.
 player := finder.Has("character_controller").GetOne()
 ```
 
-#### Finder.GetMany() []*Entity
+#### Finder.GetMany() []Entity
 Returns a list of matched entities.
 ```
 weapons := finder.Has("weapon").GetMany()
