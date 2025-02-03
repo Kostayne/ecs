@@ -2,34 +2,37 @@ package core
 
 type EntityID uint64
 
+// Internal entity implementation struct, should not be used directly.
 type DefaultEntity struct {
 	id EntityID
 	es *EntityStore
 }
 
+// Entity is just an interface, all data is stored in EntityStore as maps for performance reasons.
 type Entity interface {
-	// Returns entity ID
+	// Returns entity ID (uint64).
 	Id() EntityID
 
-	// Returns true if all components are present
+	// Returns true if entity has all provided components types.
 	Has(componentTypes ...string) bool
 
-	// Returns a specified component, may return nil
+	// Returns a component with provided type attached to the entity, may return nil if no such component exists.
 	GetOne(componentType string) *Component
 
-	// Returns a list of specified components
+	// Returns a list of components attached to the entity with provided types.
 	GetList(componentTypes ...string) []Component
 
-	// Returns a list of all components
+	// Returns a list of all components attached to the entity.
 	GetAll() []Component
 
-	// Adds provided components
+	// Attaches provided components to the entity.
 	Add(components ...Component)
 
-	// Removes components with provided types
+	// Detaches provided component types from the entity.
 	Remove(componentTypes ...string)
 }
 
+// A handy internal constructor.
 func makeEntity(id EntityID, es *EntityStore) Entity {
 	e := DefaultEntity{
 		id: id,
@@ -39,19 +42,19 @@ func makeEntity(id EntityID, es *EntityStore) Entity {
 	return &e
 }
 
-// Returns entity ID
+// Returns entity ID (uint64).
 func (e *DefaultEntity) Id() EntityID {
 	return e.id
 }
 
-// Returns true if all components are present
+// Returns true if entity has all provided components types attached to it.
 func (e *DefaultEntity) Has(componentTypes ...string) bool {
 	comps := e.GetList(componentTypes...)
 
 	return len(comps) == len(componentTypes)
 }
 
-// Returns a specified component
+// Returns an attached component by provided type, may return nil if no such component exists.
 func (e *DefaultEntity) GetOne(componentType string) *Component {
 	for _, c := range e.es.ec_map[e.id] {
 		if c.Type() == componentType {
@@ -62,7 +65,7 @@ func (e *DefaultEntity) GetOne(componentType string) *Component {
 	return nil
 }
 
-// Returns a list of specified components
+// Returns a list of components attached to the entity with provided types.
 func (e *DefaultEntity) GetList(componentTypes ...string) []Component {
 	comps := make([]Component, 0)
 
@@ -77,7 +80,7 @@ func (e *DefaultEntity) GetList(componentTypes ...string) []Component {
 	return comps
 }
 
-// Returns a list of all components
+// Returns a list of all components attached to the entity.
 func (e *DefaultEntity) GetAll() []Component {
 	comps := make([]Component, 0)
 
@@ -88,12 +91,12 @@ func (e *DefaultEntity) GetAll() []Component {
 	return comps
 }
 
-// Adds components
+// Attaches provided components to the entity.
 func (e *DefaultEntity) Add(components ...Component) {
 	e.es.AddTo(e.id, components...)
 }
 
-// Removes components
+// Detaches provided component types from the entity.
 func (e *DefaultEntity) Remove(componentTypes ...string) {
 	e.es.RemoveFrom(e.id, componentTypes...)
 }

@@ -2,18 +2,20 @@ package core
 
 import "time"
 
+// Core of the ECS engine.
 type ECS_Core interface {
 	Setup()
 	Process()
 	Cleanup()
 }
 
+// Default ECS core implementation.
 type ECS_Default struct {
 	EntityStore EntityStore
 	SystemStore SystemStore
 }
 
-// Creates a new ECS instance
+// Creates a new ECS instance.
 func MakeECS() *ECS_Default {
 	return &ECS_Default{
 		EntityStore: *MakeEntityStore(),
@@ -21,14 +23,14 @@ func MakeECS() *ECS_Default {
 	}
 }
 
-// Runs all systems setup
+// Runs all systems Setup method considering their priority.
 func (e *ECS_Default) Setup() {
 	for _, s := range e.SystemStore.GetAll() {
 		s.Setup(&e.EntityStore)
 	}
 }
 
-// Processes all systems considering their frequency and priority
+// Runs all systems Process method considering their frequency and priority.
 func (e *ECS_Default) Process() {
 	now := time.Now()
 	systems := e.SystemStore.GetAll()
@@ -45,7 +47,7 @@ func (e *ECS_Default) Process() {
 	}
 }
 
-// Runs all systems cleanup
+// Runs all systems Cleanup method considering their priority.
 func (e *ECS_Default) Cleanup() {
 	for _, s := range e.SystemStore.GetAll() {
 		s.Cleanup(&e.EntityStore)
