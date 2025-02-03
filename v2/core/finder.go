@@ -1,7 +1,5 @@
 package core
 
-import "github.com/kostayne/ecs/v2/utils"
-
 type FinderI interface {
 	Get() Entity
 	GetMany() []Entity
@@ -34,16 +32,26 @@ func MakeFinder(es *EntityStore) FinderI {
 
 // Filters entities by attached to them components presence.
 func (f *Finder) Has(components ...string) FinderI {
-	for _, c := range components {
-		for i, id := range f.entityIds {
+	matched := make([]EntityID, 0)
+
+	for _, id := range f.entityIds {
+		isMatching := true
+
+		for _, c := range components {
 			_, isCompExists := f.es.ec_map[id][c]
 
 			if !isCompExists {
-				f.entityIds = utils.FastRemoveI(f.entityIds, i)
+				isMatching = false
+				break
 			}
+		}
+
+		if isMatching {
+			matched = append(matched, id)
 		}
 	}
 
+	f.entityIds = matched
 	return f
 }
 
@@ -53,14 +61,17 @@ func (f *Finder) Where(predicate func(Entity) bool) FinderI {
 		return f
 	}
 
-	for i, id := range f.entityIds {
+	matched := make([]EntityID, 0)
+
+	for _, id := range f.entityIds {
 		e := f.es.entities[id]
 
-		if !predicate(e) {
-			f.entityIds = utils.FastRemoveI(f.entityIds, i)
+		if predicate(e) {
+			matched = append(matched, id)
 		}
 	}
 
+	f.entityIds = matched
 	return f
 }
 
