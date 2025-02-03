@@ -38,7 +38,7 @@ func (f *Finder) Has(components ...string) *Finder {
 		for i, id := range f.entityIds {
 			_, isCompExists := f.es.ec_map[id][c]
 
-			if !isCompExists {
+			if !isCompExists && i < len(f.entityIds) {
 				f.entityIds = utils.FastRemoveI(f.entityIds, i)
 			}
 		}
@@ -56,7 +56,7 @@ func (f *Finder) Where(predicate func(*Entity) bool) *Finder {
 	for i, id := range f.entityIds {
 		e := f.es.entities[id]
 
-		if !predicate(&e) {
+		if !predicate(&e) && i < len(f.entityIds) {
 			f.entityIds = utils.FastRemoveI(f.entityIds, i)
 		}
 	}
