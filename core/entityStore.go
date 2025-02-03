@@ -2,16 +2,16 @@ package core
 
 type ComponentType = string
 
-// Component to Entity map for lookup by component type
+// Component to Entity map, needed for lookup by component type.
 type CE_Map = map[ComponentType]map[EntityID]Component
 
-// Entity to Component map for lookup by entity ID
+// Entity to Component map, needed for lookup by entity ID.
 type EC_Map = map[EntityID]map[ComponentType]Component
 
-// Needed for storing empty entities
+// Internal, needed for storing empty entities.
 type _EntityMap = map[EntityID]Entity
 
-// Stores entities and provides convenient management methods
+// Stores entities and provides convenient management methods.
 type EntityStore struct {
 	maxId EntityID
 
@@ -21,7 +21,7 @@ type EntityStore struct {
 	entities map[EntityID]Entity
 }
 
-// Creates a new entity store
+// Entity store constructor.
 func MakeEntityStore() *EntityStore {
 	return &EntityStore{
 		maxId: 0,
@@ -33,7 +33,7 @@ func MakeEntityStore() *EntityStore {
 	}
 }
 
-// Creates a new entity with provided components
+// Creates a new entity and attaches provided components to it.
 func (es *EntityStore) New(components ...Component) Entity {
 
 	for _, c := range components {
@@ -47,7 +47,7 @@ func (es *EntityStore) New(components ...Component) Entity {
 	return e
 }
 
-// Removes an entity by id
+// Removes an entity by entity id, also detaches all components from the entity.
 func (es *EntityStore) Remove(id EntityID) {
 	for cType := range es.ec_map[id] {
 		delete(es.ce_map[cType], id)
@@ -57,7 +57,7 @@ func (es *EntityStore) Remove(id EntityID) {
 	delete(es.entities, id)
 }
 
-// Adds components to an entity by ID
+// Attaches components to an entity by ID.
 func (es *EntityStore) AddTo(id EntityID, components ...Component) {
 	for _, c := range components {
 		cType := c.Type()
@@ -75,7 +75,7 @@ func (es *EntityStore) AddTo(id EntityID, components ...Component) {
 	}
 }
 
-// Removes components from an entity by ID
+// Detaches components from an entity by entity ID.
 func (es *EntityStore) RemoveFrom(id EntityID, componentTypes ...string) {
 	for _, cType := range componentTypes {
 		delete(es.ce_map[cType], id)
@@ -83,7 +83,7 @@ func (es *EntityStore) RemoveFrom(id EntityID, componentTypes ...string) {
 	}
 }
 
-// Returns a list of components by entity ID
+// Returns a list of attached components by entity ID.
 func (es *EntityStore) GetComponentsById(id EntityID) []Component {
 	e := es.entities[id]
 
@@ -94,7 +94,7 @@ func (es *EntityStore) GetComponentsById(id EntityID) []Component {
 	return e.GetAll()
 }
 
-// Returns a list of all entities
+// Returns a list of all stored entities.
 func (es *EntityStore) GetAll() []*Entity {
 	entities := make([]*Entity, len(es.ec_map))
 

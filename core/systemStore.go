@@ -7,19 +7,23 @@ import (
 	"github.com/kostayne/ecs/utils"
 )
 
+// Filters entities by attached to them components presence.
 type _SystemPriority struct {
 	priority int
 	system   string
 }
 
+// Priority value getter, no setter allowed.
 func (p *_SystemPriority) GetValue() int {
 	return p.priority
 }
 
+// Priority value getter, no setter allowed.
 func (p *_SystemPriority) GetSystemType() string {
 	return p.system
 }
 
+// Manages all systems according to their priority & process frequency.
 type SystemStore struct {
 	systems map[string]System
 
@@ -30,6 +34,7 @@ type SystemStore struct {
 	lastCallTime map[string]time.Time
 }
 
+// System store constructor.
 func MakeSystemStore() *SystemStore {
 	return &SystemStore{
 		systems:      make(map[string]System),
@@ -38,6 +43,7 @@ func MakeSystemStore() *SystemStore {
 	}
 }
 
+// Adds a system to the store, so it can be processed. Panics if the same system type is already added.
 func (ss *SystemStore) Add(system System) {
 	// --- Setting up the priority
 	ss.priority = append(ss.priority, makeSystemPriority(system))
@@ -54,6 +60,7 @@ func (ss *SystemStore) Add(system System) {
 	ss.lastCallTime[system.GetType()] = time.Now()
 }
 
+// Removes a system from the store, so it can no longer be processed.
 func (ss *SystemStore) Remove(typeName string) {
 	// --- Removing the system
 	delete(ss.systems, typeName)
@@ -70,23 +77,27 @@ func (ss *SystemStore) Remove(typeName string) {
 	delete(ss.lastCallTime, typeName)
 }
 
+// Returns a system from the store by its type. May return nil if no such system was added.
 func (ss *SystemStore) Get(typeName string) System {
 	return ss.systems[typeName]
 }
 
+// Returns all systems from the store.
 func (ss *SystemStore) GetAll() map[string]System {
 	return ss.systems
 }
 
+// Returns all systems from the store sorted ascending by priority.
 func (ss *SystemStore) GetPriority() []_SystemPriority {
 	return ss.priority
 }
 
+// Returns map of last call times, key is system type, value is last call time. May be useful for debugging.
 func (ss *SystemStore) GetLastCallTime() map[string]time.Time {
 	return ss.lastCallTime
 }
 
-// --- Utils ---
+// Internal system priority constructor.
 func makeSystemPriority(system System) _SystemPriority {
 	return _SystemPriority{
 		priority: system.GetPriority(),
