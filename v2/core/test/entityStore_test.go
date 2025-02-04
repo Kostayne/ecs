@@ -6,6 +6,23 @@ import (
 	. "github.com/kostayne/ecs/v2/core"
 )
 
+type _ComponentWithHooks struct {
+	OnAttachIsCalled bool
+	OnDetachIsCalled bool
+}
+
+func (c *_ComponentWithHooks) Type() string {
+	return "component_with_hooks"
+}
+
+func (c *_ComponentWithHooks) OnAttach(e Entity) {
+	c.OnAttachIsCalled = true
+}
+
+func (c *_ComponentWithHooks) OnDetach() {
+	c.OnDetachIsCalled = true
+}
+
 func TestEntityStoreAddNew(t *testing.T) {
 	es := MakeEntityStore()
 
@@ -31,6 +48,61 @@ func TestEntityStoreAddNew(t *testing.T) {
 
 		if (e2.Id() - e1.Id()) != 1 {
 			t.Errorf("Expected consecutive ID difference to be 1, got %d", e2.Id()-e1.Id())
+		}
+	})
+
+	t.Run("Component on Attached should be called on es.New()", func(t *testing.T) {
+		c := &_ComponentWithHooks{}
+		es.New(c)
+
+		if !c.OnAttachIsCalled {
+			t.Errorf("Expected OnAttach to be called")
+		}
+	})
+
+	t.Run("Component on Attached should be called on es.AddTo()", func(t *testing.T) {
+		e := es.New()
+		c := &_ComponentWithHooks{}
+
+		es.AddTo(e.Id(), c)
+
+		if !c.OnAttachIsCalled {
+			t.Errorf("Expected OnAttach to be called")
+		}
+	})
+
+	t.Run("Component on Attached should be called on entity.Add()", func(t *testing.T) {
+		e := es.New()
+		c := &_ComponentWithHooks{}
+
+		e.Add(c)
+
+		if !c.OnAttachIsCalled {
+			t.Errorf("Expected OnAttach to be called")
+		}
+	})
+
+	t.Run("Component on Detached should be called on es.RemoveFrom()", func(t *testing.T) {
+		e := es.New()
+		c := &_ComponentWithHooks{}
+
+		es.AddTo(e.Id(), c)
+		es.RemoveFrom(e.Id(), c.Type())
+
+		if !c.OnDetachIsCalled {
+			t.Errorf("Expected OnDetach to be called")
+		}
+	})
+
+	t.Run("Component on Detached should be called on entity.Remove()", func(t *testing.T) {
+		e := es.New()
+		c := &_ComponentWithHooks{}
+
+		es.AddTo(e.Id(), c)
+		e.Remove(c.Type())
+
+		if !c.OnDetachIsCalled {
+			t.Errorf("Expected OnDetach to be called")
 		}
 	})
 }

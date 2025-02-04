@@ -35,7 +35,6 @@ func MakeEntityStore() *EntityStore {
 
 // Creates a new entity and attaches provided components to it.
 func (es *EntityStore) New(components ...Component) Entity {
-
 	for _, c := range components {
 		es.AddTo(es.maxId, c)
 	}
@@ -72,12 +71,27 @@ func (es *EntityStore) AddTo(id EntityID, components ...Component) {
 
 		es.ce_map[cType][id] = c
 		es.ec_map[id][cType] = c
+
+		hooks, ok := (c).(ComponentWithHooks)
+
+		if ok {
+			e := makeEntity(id, es)
+			hooks.OnAttach(e)
+		}
 	}
 }
 
 // Detaches components from an entity by entity ID.
 func (es *EntityStore) RemoveFrom(id EntityID, componentTypes ...string) {
 	for _, cType := range componentTypes {
+		c := es.ce_map[cType][id]
+
+		hooks, ok := (c).(ComponentWithHooks)
+
+		if ok {
+			hooks.OnDetach()
+		}
+
 		delete(es.ce_map[cType], id)
 		delete(es.ec_map[id], cType)
 	}
