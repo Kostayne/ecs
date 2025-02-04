@@ -15,7 +15,6 @@ This package provides a basic implementation of Entity Component System pattern.
 **System** - a set of logic that can be applied to the entity.
 
 ## TOC
-<!-- - [Definitions](#definitions) -->
 - [Usage](#usage)
     - [Components](#define-components)
     - [Systems](#define-systems)
@@ -84,11 +83,7 @@ func (s *MovementSystem) Process(es *core.EntityStore, dt time.Duration) {
 	entities := finder.Has("position").GetMany()
 
 	for _, e := range entities {
-		comp := *e.GetOne("position")
-		pos := comp.(*PositionComponent)
-
-		// one line version
-		// pos := (*e.Get("position")).(*PositionComponent)
+		pos := (*e.Get("position")).(*PositionComponent)
 
 		pos.X += 1
 		pos.Y += 2
@@ -144,7 +139,6 @@ func main() {
 To find out more, see the [documentation](https://pkg.go.dev/github.com/kostayne/ecs/core).
 
 ### ECS
-
 ECS is a core data structure that holds all entities and their components.
 
 ```go
@@ -157,7 +151,6 @@ type ECS struct {
 ### EntityStore
 
 Use entity store to manage entities.
-
 
 #### Manage entities
 ```go
