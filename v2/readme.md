@@ -136,7 +136,7 @@ func main() {
 ```
 
 ## Wiki
-To find out more, see the [documentation](https://pkg.go.dev/github.com/kostayne/ecs/core).
+To find out more, see the [documentation](https://pkg.go.dev/github.com/kostayne/ecs/v2/core).
 
 ### ECS
 ECS is a core data structure that holds all entities and their components.

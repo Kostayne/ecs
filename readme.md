@@ -14,6 +14,10 @@ This package provides a basic implementation of Entity Component System pattern.
 
 **System** - a set of logic that can be applied to the entity.
 
+___
+#### Check out the [v2 version](https://github.com/Kostayne/ecs/tree/main/v2)
+___
+
 ## TOC
 <!-- - [Definitions](#definitions) -->
 - [Usage](#usage)
