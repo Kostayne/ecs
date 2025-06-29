@@ -1,5 +1,11 @@
 package core
 
+import (
+	"slices"
+
+	"github.com/kostayne/ecs/v2/utils"
+)
+
 type ComponentType = string
 
 // Component to Entity map, needed for lookup by component type.
@@ -18,7 +24,8 @@ type EntityStore struct {
 	ce_map CE_Map
 	ec_map EC_Map
 
-	entities map[EntityID]Entity
+	observers []Observer
+	entities  map[EntityID]Entity
 }
 
 // Entity store constructor.
@@ -29,7 +36,8 @@ func MakeEntityStore() *EntityStore {
 		ce_map: make(CE_Map),
 		ec_map: make(EC_Map),
 
-		entities: make(_EntityMap),
+		entities:  make(_EntityMap),
+		observers: make([]Observer, 0),
 	}
 }
 
@@ -49,6 +57,8 @@ func (es *EntityStore) New(components ...Component) Entity {
 // Removes an entity by entity id, also detaches all components from the entity.
 func (es *EntityStore) Remove(id EntityID) {
 	for cType := range es.ec_map[id] {
+		es.RemoveFrom(id, cType)
+
 		delete(es.ce_map[cType], id)
 		delete(es.ec_map[id], cType)
 	}
@@ -72,6 +82,16 @@ func (es *EntityStore) AddTo(id EntityID, components ...Component) {
 		es.ce_map[cType][id] = c
 		es.ec_map[id][cType] = c
 
+		e := makeEntity(id, es)
+
+		// system hooks
+		for _, observer := range es.observers {
+			if slices.Contains(observer.GetObservedTypes(), cType) {
+				observer.OnAttach(cType, e)
+			}
+		}
+
+		// component hooks
 		hooks, ok := (c).(ComponentWithHooks)
 
 		if ok {
@@ -85,11 +105,17 @@ func (es *EntityStore) AddTo(id EntityID, components ...Component) {
 func (es *EntityStore) RemoveFrom(id EntityID, componentTypes ...string) {
 	for _, cType := range componentTypes {
 		c := es.ce_map[cType][id]
+		e := makeEntity(id, es)
 
-		hooks, ok := (c).(ComponentWithHooks)
-
-		if ok {
+		// component hooks
+		if hooks, ok := (c).(ComponentWithHooks); ok {
 			hooks.OnDetach()
+		}
+		// system hooks
+		for _, observer := range es.observers {
+			if slices.Contains(observer.GetObservedTypes(), cType) {
+				observer.OnDetach(cType, e)
+			}
 		}
 
 		delete(es.ce_map[cType], id)
@@ -110,11 +136,26 @@ func (es *EntityStore) GetById(id EntityID) []Component {
 
 // Returns a list of all stored entities.
 func (es *EntityStore) GetAll() []Entity {
-	entities := make([]Entity, len(es.ec_map))
+	entities := make([]Entity, len(es.entities))
 
-	for _, e := range es.entities {
-		entities = append(entities, e)
+	for i, e := range es.entities {
+		entities[i] = e
 	}
 
 	return entities
+}
+
+// Adds an observer to the entity store.
+func (es *EntityStore) AddObserver(observer Observer) {
+	es.observers = append(es.observers, observer)
+}
+
+// Removes an observer from the entity store.
+func (es *EntityStore) RemoveObserver(observer Observer) {
+	for i, o := range es.observers {
+		if o == observer {
+			es.observers = utils.ShiftRemoveI(es.observers, i)
+			break
+		}
+	}
 }

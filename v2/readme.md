@@ -167,6 +167,12 @@ ecs.EntityStore.AddTo(entity.Id(), MakePositionComponent(0, 0))
 ecs.EntityStore.RemoveFrom(entity.Id(), "position")
 ```
 
+### Manage observers
+```go
+ecs.EntityStore.AddObserver(observer Observer)
+ecs.EntityStore.RemoveObserver(observer Observer)
+```
+
 ### Finder
 
 Finder is a helper that allows to find entities by components or arbitrary criteria.

@@ -22,6 +22,16 @@ type System interface {
 	Cleanup(entityStore *EntityStore)
 }
 
+// System with hooks for observable components.
+type SystemWithObservableHooks interface {
+	System
+
+	// Called when an observable component is attached to an entity.
+	OnComponentAttached(componentType string, entity Entity)
+	// Called when an observable component is detached from an entity.
+	OnComponentDetached(componentType string, entity Entity)
+}
+
 // SystemBase implements the System interface but not includes Process.
 // It can be used to reduce boilerplate code, override only the methods you need.
 type SystemBase struct {
