@@ -24,6 +24,7 @@ This package provides a basic implementation of Entity Component System pattern.
 	- [EntityStore](#entitystore)
 		- [Manage entities](#manage-entities)
 		- [Manage components](#manage-components)
+		- [Manage observers](#manage-observers)
 	- [Finder](#finder)
 		- [Constructor](#----finder-constructor----)
 		- [Methods](#----finder-methods----)
