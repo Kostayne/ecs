@@ -1,7 +1,7 @@
 package core
 
 type FinderI interface {
-	Get() Entity
+	GetOne() Entity
 	GetMany() []Entity
 
 	Has(components ...string) FinderI
